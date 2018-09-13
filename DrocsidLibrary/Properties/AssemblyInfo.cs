@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DrocsidUI")]
+[assembly: AssemblyTitle("DrocsidLibrary")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Queensland Government")]
-[assembly: AssemblyProduct("DrocsidUI")]
+[assembly: AssemblyProduct("DrocsidLibrary")]
 [assembly: AssemblyCopyright("Copyright © Queensland Government 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("179bd5a1-b7c4-4fd7-8672-839015112ad3")]
+[assembly: Guid("4e18e882-7421-4bcc-accc-7036e29992ba")]
 
 // Version information for an assembly consists of the following four values:
 //

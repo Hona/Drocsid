@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrocsidUI", "DrocsidUI\DrocsidUI.csproj", "{179BD5A1-B7C4-4FD7-8672-839015112AD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrocsidLibrary", "DrocsidLibrary\DrocsidLibrary.csproj", "{4E18E882-7421-4BCC-ACCC-7036E29992BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrocsidTesting", "DrocsidTesting\DrocsidTesting.csproj", "{625D8540-48EA-4A97-B949-FD740A04D9E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{179BD5A1-B7C4-4FD7-8672-839015112AD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{179BD5A1-B7C4-4FD7-8672-839015112AD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{179BD5A1-B7C4-4FD7-8672-839015112AD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E18E882-7421-4BCC-ACCC-7036E29992BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E18E882-7421-4BCC-ACCC-7036E29992BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E18E882-7421-4BCC-ACCC-7036E29992BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E18E882-7421-4BCC-ACCC-7036E29992BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{625D8540-48EA-4A97-B949-FD740A04D9E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{625D8540-48EA-4A97-B949-FD740A04D9E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{625D8540-48EA-4A97-B949-FD740A04D9E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{625D8540-48EA-4A97-B949-FD740A04D9E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
