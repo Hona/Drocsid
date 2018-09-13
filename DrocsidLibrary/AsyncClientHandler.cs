@@ -1,64 +1,43 @@
 ﻿using System;
 using System.IO;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 
 namespace DrocsidLibrary
 {
-    internal class AsyncClientHandler
+    internal class AsyncClientHandler : AsyncReadData
     {
-        private readonly Logger _logger;
-        private readonly StreamReader _reader;
-        private readonly TcpClient _tcpClient;
-        private readonly StreamWriter _writer;
-        public EventHandler<MessageReceivedEventArgs> MessageReceived;
-
         public AsyncClientHandler(TcpClient client, Logger logger)
         {
-            _tcpClient = client;
-            _logger = logger;
+            TcpClient = client;
+            Logger = logger;
+
+            //Custom disconnect message
+            IOExceptionMessage = $"Client at {TcpClient.Client.RemoteEndPoint} disconnected";
+
             try
             {
-                var networkStream = _tcpClient.GetStream();
-                _reader = new StreamReader(networkStream);
-                _writer = new StreamWriter(networkStream) {AutoFlush = true};
+                var networkStream = TcpClient.GetStream();
+                Reader = new StreamReader(networkStream);
+                Writer = new StreamWriter(networkStream) {AutoFlush = true};
             }
             catch (Exception e)
             {
                 logger.Log(LogType.Error, e.Message);
             }
         }
-
-        public async void ReadData()
-        {
-            try
-            {
-                while (_tcpClient.Connected)
-                {
-                    var message = await _reader.ReadLineAsync();
-                    OnMessageReceived(message);
-                }
-            }
-            catch (IOException)
-            {
-                _logger.Log(LogType.Info, $"Client at {_tcpClient.Client.RemoteEndPoint} disconnected");
-            }
-        }
-
-        protected virtual void OnMessageReceived(string message)
-        {
-            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
-        }
-
+        /// <summary>
+        /// Writes a message to the server
+        /// </summary>
+        /// <param name="message"></param>
         public async void SendMessageAsync(string message)
         {
             try
             {
-                await _writer.WriteLineAsync(message);
+                await Writer.WriteLineAsync(message);
             }
             catch (IOException e)
             {
-                _logger.Log(LogType.Error, $"{e.Message} (Do you have multiple clients open?)");
+                Logger.Log(LogType.Error, $"{e.Message}");
             }
         }
     }

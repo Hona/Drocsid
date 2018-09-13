@@ -1,75 +1,47 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace DrocsidLibrary
 {
-    public class AsyncClient
+    public class AsyncClient : AsyncReadData
     {
-        private readonly Logger _logger;
-        private StreamReader _reader;
-        private readonly TcpClient _tcpClient;
-        private StreamWriter _writer;
-        public EventHandler<MessageReceivedEventArgs> MessageReceived;
-
         public AsyncClient(Logger logger)
         {
-            _logger = logger;
-            _tcpClient = new TcpClient();
+            Logger = logger;
+            TcpClient = new TcpClient();
 
+            //Custom disconnect message
+            IOExceptionMessage = "Server closed the connection";
         }
 
-        public async void Connect(IPAddress serverAddress)
+        public async Task Connect(IPAddress serverAddress)
         {
-            _logger.Log(LogType.Info, $"Connecting to {serverAddress}:{Constants.Port}");
-            await _tcpClient.ConnectAsync(serverAddress, Constants.Port);
+            Logger.Log(LogType.Info, $"Connecting to {serverAddress}:{Constants.Port}");
+            //Waits for the client to connect
             try
             {
-                var networkStream = _tcpClient.GetStream();
-                _reader = new StreamReader(networkStream);
-                _writer = new StreamWriter(networkStream) { AutoFlush = true };
+                await TcpClient.ConnectAsync(serverAddress, Constants.Port);
+                //Get the StreamReader/Writer from the TcpClients network stream
+                var networkStream = TcpClient.GetStream();
+                Reader = new StreamReader(networkStream);
+
+                //AutoFlush automatically sends data written
+                Writer = new StreamWriter(networkStream) {AutoFlush = true};
             }
             catch
             {
-                _logger.Log(LogType.Warning, "Could not connect to the server");
+                Logger.Log(LogType.Warning, "Could not connect to the server");
                 Stop();
             }
         }
 
-        public async void ReceiveData()
-        {
-            try
-            {
-                while (_tcpClient.Connected)
-                {
-                    var message = await _reader.ReadLineAsync();
-                    OnMessageReceived(message);
-                }
-            }
-            catch (IOException)
-            {
-                _logger.Log(LogType.Info, "Server closed the connection");
-            }
-        }
-
-        protected virtual void OnMessageReceived(string message)
-        {
-            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
-        }
-
         public async void SendMessageAsync(string message)
         {
-            await _writer.WriteLineAsync(message);
+            await Writer.WriteLineAsync(message);
             //Hooks into the received message to write your own message
             OnMessageReceived(message);
-        }
-
-        public void Stop()
-        {
-            _reader.Close();
-            _writer.Close();
-            _tcpClient.Close();
         }
     }
 }

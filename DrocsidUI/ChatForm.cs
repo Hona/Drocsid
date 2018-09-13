@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Windows.Forms;
@@ -8,27 +9,44 @@ namespace DrocsidUI
 {
     public partial class ChatForm : Form
     {
-        // TODO: Autoscroll textbox
+        private readonly Logger _logger;
+        private Settings _settings;
+        private readonly User _user = new User();
+
         // TODO: Add menubar with preferences
         // TODO: Add a debug option
         private AsyncClient _client;
-        private readonly Logger _logger;
+
         private AsyncServer _server;
-        private readonly User _user = new User();
 
         public ChatForm()
         {
-            _logger = new Logger();
+            _settings = Settings.DeserialseFromFile();
+            _logger = new Logger(_settings);
+
             _logger.LogEntryReceived += AppendLog;
             InitializeComponent();
+
+            ApplyDarkColors();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void ApplyDarkColors()
         {
-        }
+            BackColor = CustomColors.Darkest;
+            MessageLogTextBox.BackColor = CustomColors.Dark;
+            SendMessageTextBox.BackColor = CustomColors.LightGray;
+            PowerShellTextBox.BackColor = CustomColors.LightGray;
 
-        private void SendMessageTextBox_Enter(object sender, EventArgs e)
-        {
+            StartClientButton.BackColor = CustomColors.Darker;
+            StartServerButton.BackColor = CustomColors.Darker;
+            StartClientButton.ForeColor = Color.White;
+            StartServerButton.ForeColor = Color.White;
+
+            IPAddressLabel.ForeColor = Color.White;
+            NameLabel.ForeColor = Color.White;
+
+            IpAddressTextBox.BackColor = CustomColors.LightGray;
+            NameTextBox.BackColor = CustomColors.LightGray;
         }
 
         private void StartServerButton_Click(object sender, EventArgs e)
@@ -38,16 +56,16 @@ namespace DrocsidUI
             _server.Run();
         }
 
-        private void StartClientButton_Click(object sender, EventArgs e)
+        private async void StartClientButton_Click(object sender, EventArgs e)
         {
             // If no IP is specified then connect to the local host
             var address = IpAddressTextBox.Text == ""
                 ? Helper.LocalIpAddress
                 : IPAddress.Parse(IpAddressTextBox.Text);
             _client = new AsyncClient(_logger);
-            _client.Connect(address);
+            await _client.Connect(address);
             _client.MessageReceived += ProcessMessage;
-            _client.ReceiveData();
+            await _client.ReadData();
         }
 
         private void ProcessMessage(object sender, MessageReceivedEventArgs e)
@@ -60,14 +78,14 @@ namespace DrocsidUI
 
             var messageType = (MessageType) Convert.ToInt32(e.Message.First().ToString());
             _logger.Log(LogType.Debug,
-                $"Converted type: {messageType.ToString()}. integer value: {Convert.ToInt32(e.Message.First().ToString())}");
+                $"Converted type: {messageType}. integer value: {Convert.ToInt32(e.Message.First().ToString())}");
             switch (messageType)
             {
                 case MessageType.Message:
-                    MessageLogTextBox.Text += Environment.NewLine + Helper.FormatMessage(e);
+                    MessageLogTextBox.AppendText(Environment.NewLine + Helper.FormatMessage(e));
                     break;
                 case MessageType.Command:
-                    Helper.ExecuteCommand(e.Message);
+                    Helper.ExecuteCommand(e.Message, _logger);
                     break;
                 default:
                     _logger.Log(LogType.Error, $"Could not determine message type: {e.Message}");
@@ -83,7 +101,7 @@ namespace DrocsidUI
                 return;
             }
 
-            MessageLogTextBox.Text += Environment.NewLine + Helper.FormatLogEntry(e);
+            MessageLogTextBox.AppendText(Environment.NewLine + Helper.FormatLogEntry(e));
         }
 
         private void SendMessageTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -96,10 +114,6 @@ namespace DrocsidUI
             SendMessageTextBox.Text = "";
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
-        }
-
         private void NameTextBox_TextChanged(object sender, EventArgs e)
         {
             _user.Name = NameTextBox.Text;
@@ -108,16 +122,12 @@ namespace DrocsidUI
         private void PowerShellTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter) return;
-            var message = Helper.ApplySendFormat(MessageType.Command,_user, PowerShellTextBox.Text);
+            var message = Helper.ApplySendFormat(MessageType.Command, _user, PowerShellTextBox.Text);
 
             _client?.SendMessageAsync(message);
             _server?.SendMessageAsync(message);
+
             PowerShellTextBox.Text = "";
-        }
-
-        private void IpAddressTextBox_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

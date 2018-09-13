@@ -6,7 +6,8 @@ namespace DrocsidTesting
     [TestClass]
     public class Formatting
     {
-        private User _user = new User {Name = "Test Name123"};
+        private readonly User _user = new User {Name = "Test Name123"};
+
         [TestMethod]
         public void ApplyMessageFormattingTest()
         {

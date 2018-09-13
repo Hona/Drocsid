@@ -10,6 +10,7 @@ namespace DrocsidLibrary
         private readonly Logger _logger;
         private TcpListener _tcpListener;
         public EventHandler<MessageReceivedEventArgs> MessageReceived;
+        private bool _acceptClients;
 
         public AsyncServer(Logger logger)
         {
@@ -25,13 +26,16 @@ namespace DrocsidLibrary
             _tcpListener = new TcpListener(Helper.LocalIpAddress, Constants.Port);
             _tcpListener.Start();
 
-            AcceptClients();
+            _acceptClients = true;
+            AcceptClientsAsync();
         }
-
-        private async void AcceptClients()
+        /// <summary>
+        /// Accepts incoming connections until close
+        /// </summary>
+        private async void AcceptClientsAsync()
         {
             _logger.Log(LogType.Info, "Accepting clients");
-            while (true)
+            while (_acceptClients)
                 try
                 {
                     var newClient = await _tcpListener.AcceptTcpClientAsync();
@@ -46,18 +50,21 @@ namespace DrocsidLibrary
         /// <summary>
         ///     Handles each Client connection asynchronously
         /// </summary>
-        /// <returns></returns>
         private async void ProcessClient(TcpClient client)
         {
             _logger.Log(LogType.Info, $"Client connected from {client.Client.RemoteEndPoint}");
             var handler = new AsyncClientHandler(client, _logger);
 
-            handler.MessageReceived += HandleNewMessage;
+            handler.MessageReceived += DistributeClientMessage;
             _clientHandlers.Add(handler);
             await handler.ReadData();
         }
-
-        private void HandleNewMessage(object sender, MessageReceivedEventArgs e)
+        /// <summary>
+        /// Sends client message to all other clients, and fires the event
+        /// </summary>
+        /// <param name="sender">The sending AsyncClientHandler</param>
+        /// <param name="e">Contains the message and timestamp</param>
+        private void DistributeClientMessage(object sender, MessageReceivedEventArgs e)
         {
             foreach (var handler in _clientHandlers)
             {
@@ -68,7 +75,14 @@ namespace DrocsidLibrary
             // Sends to the UI
             OnMessageReceived(e);
         }
-
+        private void OnMessageReceived(MessageReceivedEventArgs e)
+        {
+            MessageReceived?.Invoke(this, e);
+        }
+        /// <summary>
+        /// Sends a message to all client handlers
+        /// </summary>
+        /// <param name="message"></param>
         public void SendMessageAsync(string message)
         {
             foreach (var handler in _clientHandlers) handler.SendMessageAsync(message);
@@ -76,9 +90,15 @@ namespace DrocsidLibrary
             OnMessageReceived(new MessageReceivedEventArgs(message));
         }
 
-        protected virtual void OnMessageReceived(MessageReceivedEventArgs e)
+        public void Stop()
         {
-            MessageReceived?.Invoke(this, e);
+            _acceptClients = false;
+            foreach (var handler in _clientHandlers)
+            {
+                handler.Stop();
+            }
+            _tcpListener.Stop();
         }
+
     }
 }
