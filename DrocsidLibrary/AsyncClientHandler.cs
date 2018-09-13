@@ -29,7 +29,7 @@ namespace DrocsidLibrary
             }
         }
 
-        public async Task ReadData()
+        public async void ReadData()
         {
             try
             {

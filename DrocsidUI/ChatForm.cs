@@ -44,7 +44,8 @@ namespace DrocsidUI
             var address = IpAddressTextBox.Text == ""
                 ? Helper.LocalIpAddress
                 : IPAddress.Parse(IpAddressTextBox.Text);
-            _client = new AsyncClient(address, _logger);
+            _client = new AsyncClient(_logger);
+            _client.Connect(address);
             _client.MessageReceived += ProcessMessage;
             _client.ReceiveData();
         }
@@ -107,7 +108,7 @@ namespace DrocsidUI
         private void PowerShellTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter) return;
-            var message = Helper.ApplySendFormat(MessageType.Command, PowerShellTextBox.Text);
+            var message = Helper.ApplySendFormat(MessageType.Command,_user, PowerShellTextBox.Text);
 
             _client?.SendMessageAsync(message);
             _server?.SendMessageAsync(message);

@@ -8,22 +8,27 @@ namespace DrocsidLibrary
     public class AsyncClient
     {
         private readonly Logger _logger;
-        private readonly StreamReader _reader;
+        private StreamReader _reader;
         private readonly TcpClient _tcpClient;
-        private readonly StreamWriter _writer;
+        private StreamWriter _writer;
         public EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        public AsyncClient(IPAddress serverAddress, Logger logger)
+        public AsyncClient(Logger logger)
         {
             _logger = logger;
             _tcpClient = new TcpClient();
+
+        }
+
+        public async void Connect(IPAddress serverAddress)
+        {
             _logger.Log(LogType.Info, $"Connecting to {serverAddress}:{Constants.Port}");
-            _tcpClient.Connect(serverAddress, Constants.Port);
+            await _tcpClient.ConnectAsync(serverAddress, Constants.Port);
             try
             {
                 var networkStream = _tcpClient.GetStream();
                 _reader = new StreamReader(networkStream);
-                _writer = new StreamWriter(networkStream) {AutoFlush = true};
+                _writer = new StreamWriter(networkStream) { AutoFlush = true };
             }
             catch
             {
