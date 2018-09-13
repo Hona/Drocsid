@@ -30,9 +30,9 @@ namespace DrocsidLibrary
             return $"[{e.Type.ToString().ToUpper()}] {e.DateTimeLogged.ToShortTimeString()}: {e.Message}";
         }
 
-        public static string ApplySendFormat(MessageType type, string message)
+        public static string ApplySendFormat(MessageType type, User user, string message)
         {
-            return (int)type + message;
+            return (int)type + $"{user.Name}: " + message;
         }
 
         public static void ExecuteCommand(string message)

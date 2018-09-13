@@ -109,6 +109,7 @@
             this.IpAddressTextBox.Name = "IpAddressTextBox";
             this.IpAddressTextBox.Size = new System.Drawing.Size(174, 20);
             this.IpAddressTextBox.TabIndex = 6;
+            this.IpAddressTextBox.TextChanged += new System.EventHandler(this.IpAddressTextBox_TextChanged);
             // 
             // PowerShellTextBox
             // 

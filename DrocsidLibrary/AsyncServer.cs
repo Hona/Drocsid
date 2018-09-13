@@ -72,6 +72,8 @@ namespace DrocsidLibrary
         public void SendMessageAsync(string message)
         {
             foreach (var handler in _clientHandlers) handler.SendMessageAsync(message);
+            //Hook into received messages to write your own message
+            OnMessageReceived(new MessageReceivedEventArgs(message));
         }
 
         protected virtual void OnMessageReceived(MessageReceivedEventArgs e)

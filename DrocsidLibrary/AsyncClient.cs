@@ -28,6 +28,7 @@ namespace DrocsidLibrary
             catch
             {
                 _logger.Log(LogType.Warning, "Could not connect to the server");
+                Stop();
             }
         }
 
@@ -55,6 +56,15 @@ namespace DrocsidLibrary
         public async void SendMessageAsync(string message)
         {
             await _writer.WriteLineAsync(message);
+            //Hooks into the received message to write your own message
+            OnMessageReceived(message);
+        }
+
+        public void Stop()
+        {
+            _reader.Close();
+            _writer.Close();
+            _tcpClient.Close();
         }
     }
 }

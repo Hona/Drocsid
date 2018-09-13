@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 using DrocsidLibrary;
 
@@ -39,7 +40,11 @@ namespace DrocsidUI
 
         private void StartClientButton_Click(object sender, EventArgs e)
         {
-            _client = new AsyncClient(Helper.LocalIpAddress, _logger);
+            // If no IP is specified then connect to the local host
+            var address = IpAddressTextBox.Text == ""
+                ? Helper.LocalIpAddress
+                : IPAddress.Parse(IpAddressTextBox.Text);
+            _client = new AsyncClient(address, _logger);
             _client.MessageReceived += ProcessMessage;
             _client.ReceiveData();
         }
@@ -83,7 +88,7 @@ namespace DrocsidUI
         private void SendMessageTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter) return;
-            var message = Helper.ApplySendFormat(MessageType.Message, SendMessageTextBox.Text);
+            var message = Helper.ApplySendFormat(MessageType.Message, _user, SendMessageTextBox.Text);
 
             _client?.SendMessageAsync(message);
             _server?.SendMessageAsync(message);
@@ -107,6 +112,11 @@ namespace DrocsidUI
             _client?.SendMessageAsync(message);
             _server?.SendMessageAsync(message);
             PowerShellTextBox.Text = "";
+        }
+
+        private void IpAddressTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
