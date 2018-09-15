@@ -8,9 +8,9 @@ namespace DrocsidLibrary
     {
         private readonly List<AsyncClientHandler> _clientHandlers = new List<AsyncClientHandler>();
         private readonly Logger _logger;
+        private bool _acceptClients;
         private TcpListener _tcpListener;
         public EventHandler<MessageReceivedEventArgs> MessageReceived;
-        private bool _acceptClients;
 
         public AsyncServer(Logger logger)
         {
@@ -29,8 +29,9 @@ namespace DrocsidLibrary
             _acceptClients = true;
             AcceptClientsAsync();
         }
+
         /// <summary>
-        /// Accepts incoming connections until close
+        ///     Accepts incoming connections until close
         /// </summary>
         private async void AcceptClientsAsync()
         {
@@ -59,8 +60,9 @@ namespace DrocsidLibrary
             _clientHandlers.Add(handler);
             await handler.ReadData();
         }
+
         /// <summary>
-        /// Sends client message to all other clients, and fires the event
+        ///     Sends client message to all other clients, and fires the event
         /// </summary>
         /// <param name="sender">The sending AsyncClientHandler</param>
         /// <param name="e">Contains the message and timestamp</param>
@@ -75,30 +77,29 @@ namespace DrocsidLibrary
             // Sends to the UI
             OnMessageReceived(e);
         }
+
         private void OnMessageReceived(MessageReceivedEventArgs e)
         {
             MessageReceived?.Invoke(this, e);
         }
+
         /// <summary>
-        /// Sends a message to all client handlers
+        ///     Sends a message to all client handlers
         /// </summary>
         /// <param name="message"></param>
         public void SendMessageAsync(string message)
         {
             foreach (var handler in _clientHandlers) handler.SendMessageAsync(message);
             //Hook into received messages to write your own message
-            OnMessageReceived(new MessageReceivedEventArgs(message));
+            OnMessageReceived(new MessageReceivedEventArgs(message, true));
         }
 
         public void Stop()
         {
             _acceptClients = false;
             foreach (var handler in _clientHandlers)
-            {
                 handler.Stop();
-            }
             _tcpListener.Stop();
         }
-
     }
 }

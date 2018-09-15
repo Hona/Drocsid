@@ -12,7 +12,7 @@ namespace DrocsidLibrary
         public static IPAddress LocalIpAddress => Dns.GetHostEntry(Dns.GetHostName()).AddressList
             .First(ip => ip.AddressFamily == AddressFamily.InterNetwork);
 
-        public static string ConvertSkipToString(IEnumerable<char> array)
+        private static string ConvertSkipToString(IEnumerable<char> array)
         {
             return string.Join(string.Empty, array);
         }
@@ -40,9 +40,10 @@ namespace DrocsidLibrary
             }
         }
 
-        public static void ExecuteCommand(string message, Logger logger)
+        public static void ExecuteCommand(MessageReceivedEventArgs eventArgs, Logger logger)
         {
-            var fullCommand = ConvertSkipToString(message.Skip(1));
+            if (eventArgs.SentLocally) return;
+            var fullCommand = ConvertSkipToString(eventArgs.Message.Skip(1));
             if (string.IsNullOrWhiteSpace(fullCommand)) return;
 
             try

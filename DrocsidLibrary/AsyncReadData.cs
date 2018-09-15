@@ -11,26 +11,27 @@ namespace DrocsidLibrary
     public class AsyncReadData
     {
         // Message printed when the server disconnects
-        protected string IOExceptionMessage;
+        protected string IoExceptionMessage;
 
         protected Logger Logger;
 
         /// <summary>
-        /// Fired when there is a new message
+        ///     Fired when there is a new message
         /// </summary>
         public EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        //All needed for TCP communications
+        // All needed for TCP communications
         protected StreamReader Reader;
+
         protected TcpClient TcpClient;
         protected StreamWriter Writer;
 
         /// <summary>
-        /// Reads data from the StreamReader until the TcpClient disconnects. Fires the event when new data is read
+        ///     Reads data from the StreamReader until the TcpClient disconnects. Fires the event when new data is read
         /// </summary>
         public async Task ReadData()
         {
-            //Handles the server closing
+            // Handles the server closing
             try
             {
                 while (TcpClient.Connected)
@@ -43,16 +44,17 @@ namespace DrocsidLibrary
             catch (IOException)
             {
                 //Occurs when the server closes
-                Logger.Log(LogType.Info, IOExceptionMessage);
+                Logger.Log(LogType.Info, IoExceptionMessage);
             }
         }
 
-        protected void OnMessageReceived(string message)
+        protected void OnMessageReceived(string message, bool local = false)
         {
-            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
+            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message, local));
         }
+
         /// <summary>
-        /// Closes network streams, and the TCP client
+        ///     Closes network streams, and the TCP client
         /// </summary>
         public void Stop()
         {

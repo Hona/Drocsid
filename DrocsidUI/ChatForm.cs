@@ -9,15 +9,15 @@ namespace DrocsidUI
 {
     public partial class ChatForm : Form
     {
-        private readonly Logger _logger;
-        private Settings _settings;
-        private readonly User _user = new User();
-
         // TODO: Add menubar with preferences
         // TODO: Add a debug option
-        private AsyncClient _client;
 
-        private AsyncServer _server;
+        private readonly Logger _logger;
+        internal readonly User User = new User();
+        private readonly Settings _settings;
+
+        internal AsyncClient Client;
+        internal AsyncServer Server;
 
         public ChatForm()
         {
@@ -35,7 +35,6 @@ namespace DrocsidUI
             BackColor = CustomColors.Darkest;
             MessageLogTextBox.BackColor = CustomColors.Dark;
             SendMessageTextBox.BackColor = CustomColors.LightGray;
-            PowerShellTextBox.BackColor = CustomColors.LightGray;
 
             StartClientButton.BackColor = CustomColors.Darker;
             StartServerButton.BackColor = CustomColors.Darker;
@@ -51,9 +50,9 @@ namespace DrocsidUI
 
         private void StartServerButton_Click(object sender, EventArgs e)
         {
-            _server = new AsyncServer(_logger);
-            _server.MessageReceived += ProcessMessage;
-            _server.Run();
+            Server = new AsyncServer(_logger);
+            Server.MessageReceived += ProcessMessage;
+            Server.Run();
         }
 
         private async void StartClientButton_Click(object sender, EventArgs e)
@@ -62,10 +61,10 @@ namespace DrocsidUI
             var address = IpAddressTextBox.Text == ""
                 ? Helper.LocalIpAddress
                 : IPAddress.Parse(IpAddressTextBox.Text);
-            _client = new AsyncClient(_logger);
-            await _client.Connect(address);
-            _client.MessageReceived += ProcessMessage;
-            await _client.ReadData();
+            Client = new AsyncClient(_logger);
+            await Client.Connect(address);
+            Client.MessageReceived += ProcessMessage;
+            await Client.ReadData();
         }
 
         private void ProcessMessage(object sender, MessageReceivedEventArgs e)
@@ -85,7 +84,7 @@ namespace DrocsidUI
                     MessageLogTextBox.AppendText(Environment.NewLine + Helper.FormatMessage(e));
                     break;
                 case MessageType.Command:
-                    Helper.ExecuteCommand(e.Message, _logger);
+                    Helper.ExecuteCommand(e, _logger);
                     break;
                 default:
                     _logger.Log(LogType.Error, $"Could not determine message type: {e.Message}");
@@ -107,27 +106,37 @@ namespace DrocsidUI
         private void SendMessageTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter) return;
-            var message = Helper.ApplySendFormat(MessageType.Message, _user, SendMessageTextBox.Text);
+            var message = Helper.ApplySendFormat(MessageType.Message, User, SendMessageTextBox.Text);
 
-            _client?.SendMessageAsync(message);
-            _server?.SendMessageAsync(message);
+            Client?.SendMessageAsync(message);
+            Server?.SendMessageAsync(message);
             SendMessageTextBox.Text = "";
         }
 
         private void NameTextBox_TextChanged(object sender, EventArgs e)
         {
-            _user.Name = NameTextBox.Text;
+            User.Name = NameTextBox.Text;
         }
 
-        private void PowerShellTextBox_KeyDown(object sender, KeyEventArgs e)
+        private void AdminButton_Click(object sender, EventArgs e)
         {
-            if (e.KeyCode != Keys.Enter) return;
-            var message = Helper.ApplySendFormat(MessageType.Command, _user, PowerShellTextBox.Text);
+            if (SendMessageTextBox.Text == Constants.Password)
+            {
+                var adminForm = new AdminForm(this);
+                adminForm.Show();
+            }
+            else
+            {
+                _logger.Log(LogType.Warning,
+                    "You are not admin, if you think this is an error, please contact the developer");
+            }
+        }
 
-            _client?.SendMessageAsync(message);
-            _server?.SendMessageAsync(message);
-
-            PowerShellTextBox.Text = "";
+        private void ChatForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _settings.SerialiseToFile();
+            Client?.Stop();
+            Server?.Stop();
         }
     }
 }

@@ -36,7 +36,7 @@
             this.NameLabel = new System.Windows.Forms.Label();
             this.IPAddressLabel = new System.Windows.Forms.Label();
             this.IpAddressTextBox = new System.Windows.Forms.TextBox();
-            this.PowerShellTextBox = new System.Windows.Forms.TextBox();
+            this.AdminButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // StartServerButton
@@ -71,7 +71,7 @@
             this.MessageLogTextBox.Multiline = true;
             this.MessageLogTextBox.Name = "MessageLogTextBox";
             this.MessageLogTextBox.ReadOnly = true;
-            this.MessageLogTextBox.Size = new System.Drawing.Size(694, 320);
+            this.MessageLogTextBox.Size = new System.Drawing.Size(691, 320);
             this.MessageLogTextBox.TabIndex = 2;
             // 
             // SendMessageTextBox
@@ -80,7 +80,7 @@
             this.SendMessageTextBox.ForeColor = System.Drawing.Color.White;
             this.SendMessageTextBox.Location = new System.Drawing.Point(170, 369);
             this.SendMessageTextBox.Name = "SendMessageTextBox";
-            this.SendMessageTextBox.Size = new System.Drawing.Size(694, 20);
+            this.SendMessageTextBox.Size = new System.Drawing.Size(691, 20);
             this.SendMessageTextBox.TabIndex = 3;
             this.SendMessageTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SendMessageTextBox_KeyDown);
             // 
@@ -121,22 +121,24 @@
             this.IpAddressTextBox.Size = new System.Drawing.Size(126, 20);
             this.IpAddressTextBox.TabIndex = 6;
             // 
-            // PowerShellTextBox
+            // AdminButton
             // 
-            this.PowerShellTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PowerShellTextBox.ForeColor = System.Drawing.Color.White;
-            this.PowerShellTextBox.Location = new System.Drawing.Point(170, 395);
-            this.PowerShellTextBox.Name = "PowerShellTextBox";
-            this.PowerShellTextBox.Size = new System.Drawing.Size(694, 20);
-            this.PowerShellTextBox.TabIndex = 8;
-            this.PowerShellTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PowerShellTextBox_KeyDown);
+            this.AdminButton.FlatAppearance.BorderSize = 0;
+            this.AdminButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.AdminButton.Location = new System.Drawing.Point(12, 340);
+            this.AdminButton.Name = "AdminButton";
+            this.AdminButton.Size = new System.Drawing.Size(152, 23);
+            this.AdminButton.TabIndex = 9;
+            this.AdminButton.Text = "Admin Panel";
+            this.AdminButton.UseVisualStyleBackColor = true;
+            this.AdminButton.Click += new System.EventHandler(this.AdminButton_Click);
             // 
             // ChatForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(876, 423);
-            this.Controls.Add(this.PowerShellTextBox);
+            this.ClientSize = new System.Drawing.Size(873, 400);
+            this.Controls.Add(this.AdminButton);
             this.Controls.Add(this.IPAddressLabel);
             this.Controls.Add(this.IpAddressTextBox);
             this.Controls.Add(this.NameLabel);
@@ -147,6 +149,7 @@
             this.Controls.Add(this.StartServerButton);
             this.Name = "ChatForm";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatForm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -162,7 +165,7 @@
         private System.Windows.Forms.Label NameLabel;
         private System.Windows.Forms.Label IPAddressLabel;
         private System.Windows.Forms.TextBox IpAddressTextBox;
-        private System.Windows.Forms.TextBox PowerShellTextBox;
+        private System.Windows.Forms.Button AdminButton;
     }
 }
 

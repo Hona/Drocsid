@@ -13,7 +13,7 @@ namespace DrocsidLibrary
             TcpClient = new TcpClient();
 
             //Custom disconnect message
-            IOExceptionMessage = "Server closed the connection";
+            IoExceptionMessage = "Server closed the connection";
         }
 
         public async Task Connect(IPAddress serverAddress)
@@ -40,8 +40,9 @@ namespace DrocsidLibrary
         public async void SendMessageAsync(string message)
         {
             await Writer.WriteLineAsync(message);
+
             //Hooks into the received message to write your own message
-            OnMessageReceived(message);
+            OnMessageReceived(message, true);
         }
     }
 }

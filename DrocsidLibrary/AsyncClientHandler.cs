@@ -11,8 +11,8 @@ namespace DrocsidLibrary
             TcpClient = client;
             Logger = logger;
 
-            //Custom disconnect message
-            IOExceptionMessage = $"Client at {TcpClient.Client.RemoteEndPoint} disconnected";
+            // Custom disconnect message
+            IoExceptionMessage = $"Client at {TcpClient.Client.RemoteEndPoint} disconnected";
 
             try
             {
@@ -25,8 +25,9 @@ namespace DrocsidLibrary
                 logger.Log(LogType.Error, e.Message);
             }
         }
+
         /// <summary>
-        /// Writes a message to the server
+        ///     Writes a message to the server
         /// </summary>
         /// <param name="message"></param>
         public async void SendMessageAsync(string message)

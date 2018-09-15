@@ -4,12 +4,13 @@ namespace DrocsidLibrary
 {
     public class Logger
     {
-        private Settings _settings;
+        private readonly Settings _settings;
+        public EventHandler<LogEventArgs> LogEntryReceived;
+
         public Logger(Settings settings)
         {
             _settings = settings;
         }
-        public EventHandler<LogEventArgs> LogEntryReceived;
 
         public void Log(LogType type, string message)
         {
